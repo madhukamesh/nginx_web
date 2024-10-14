@@ -18,6 +18,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        projects: ['nginx', 'web']
 
     steps:
       # Step 1: Checkout/download the repository code
@@ -51,7 +54,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/madhukamesh/nginx
+            ghcr.io/madhukamesh/${{ matrix.projects }}
           tags: |
             ${{ github.sha }}
             type=ref,event=branch
@@ -62,6 +65,6 @@ jobs:
       - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./nginx
+          context: ./${{ matrix.projects }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
